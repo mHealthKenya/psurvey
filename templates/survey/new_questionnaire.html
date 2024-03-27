@@ -82,10 +82,30 @@
                                                required>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label class="form-control-label" for="isActive">Number of Questions</label>
                                         <input class="form-control" type="number" name="num_questions" min="1" required placeholder="Number of Questions">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="target_app">Target App</label>
+                                        <select class="form-control" name="target_app" id="target_app" required>
+                                            <option value="" disabled selected hidden>Choose One...</option>
+                                            <option value="Facility">PSurvey</option>
+                                            <option value="Patient">Nishauri</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">                                
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="responses_table">Survey Keyword Tags</label>
+                                        <input type="text" id="responses_table" name="responses_table" class="form-control" placeholder="e.g. weight loss" required pattern=".{2,50}" title="Should be between 2 to 50 chars">
                                     </div>
                                 </div>
                             </div>

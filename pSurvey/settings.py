@@ -34,11 +34,12 @@ def get_secret(setting, secrets=secrets):
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'b6&xe78vjs@fr3hjek^36e#01nrq*tgipu5q49s9p0n2-f0q5)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -49,12 +50,15 @@ INSTALLED_APPS = [
     'survey',
     'errorPages',
     'reports',
+    'whitenoise.runserver_nostatic',
 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.humanize',
+    'import_export',
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
@@ -64,6 +68,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -82,8 +87,7 @@ ROOT_URLCONF = 'pSurvey.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -99,17 +103,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'pSurvey.wsgi.application'
 
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'pSurvey',
+        'NAME': 'psurveyapi',
         'USER': get_secret('USER'),
         'PASSWORD':  get_secret('PWD'),
-        'HOST': get_secret('HOST'),  # Or an IP Address that your DB is hosted on
+        # Or an IP Address that your DB is hosted on
+        'HOST': get_secret('HOST'),
         'PORT': get_secret('DB_PORT'),
     }
 }
@@ -190,3 +194,4 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
+CSRF_TRUSTED_ORIGINS = ['https://psurveytest.kenyahmis.org']
