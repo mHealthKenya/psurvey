@@ -1,4 +1,4 @@
-from django.conf.urls import url
+# from django.urls import re_path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from pSurvey import settings
@@ -14,6 +14,7 @@ urlpatterns = [
 
     # Web
     path('', views.web_login, name='web-login'),
+    path('web/forgot-password/', views.forgot_password, name='forgot-password'),
     path('web/logout/', views.logout_request, name='web-logout'),
     path('web/profile/', views.profile, name='profile'),
     path('web/facility-partner/', views.facility_partner_list, name='facility-partner-list'),

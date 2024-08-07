@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.db import models
+from django.forms import ModelForm
 from authApp.models import Facility, Users
 
 
@@ -12,6 +13,10 @@ class Questionnaire (models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     number_of_questions = models.IntegerField(default=1)
     active_till = models.DateField(default=datetime.now)
+    target_app = models.CharField(max_length=45)
+    responses_table_name = models.CharField(max_length=255)
+    is_published = models.BooleanField(default=False)
+    has_uploaded_data = models.BooleanField(default=False)
 
     class Meta:
         db_table = "Questionnaires"
@@ -19,18 +24,22 @@ class Questionnaire (models.Model):
 
 class Question (models.Model):
     questionnaire = models.ForeignKey(Questionnaire, on_delete=models.CASCADE)
-    question =  models.CharField(max_length=500)
+    question = models.CharField(max_length=500)
     question_type = models.IntegerField()
     question_order = models.IntegerField(default=1)
+    is_required = models.BooleanField(default=False)
+    date_validation = models.CharField(max_length=20, default=None)
+    is_repeatable = models.BooleanField(default=False)
+    response_col_name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Users, on_delete=models.CASCADE)
-
 
     class Meta:
         db_table = "Questions"
 
+
 class Answer (models.Model):
-    question= models.ForeignKey(Question, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     option = models.CharField(max_length=455)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(Users, on_delete=models.CASCADE, default=1)
@@ -41,11 +50,12 @@ class Answer (models.Model):
 
 class QuestionDependance (models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    answer = models.ForeignKey(Answer, on_delete=models.CASCADE, related_name='response_id')
-
+    answer = models.ForeignKey(
+        Answer, on_delete=models.CASCADE, related_name='response_id')
 
     class Meta:
         db_table = "QuestionDependance"
+
 
 class Questionnaire_Participants (models.Model):
     participant = models.CharField(max_length=100)
@@ -55,22 +65,35 @@ class Questionnaire_Participants (models.Model):
     class Meta:
         db_table = "Questionnaire_Participants"
 
+
 class Started_Questionnaire (models.Model):
     ccc_number = models.CharField(max_length=15, null=True)
     firstname = models.CharField(max_length=300, null=True)
     questionnaire = models.ForeignKey(Questionnaire, on_delete=models.CASCADE)
-    questionnaire_participant = models.ForeignKey(Questionnaire_Participants, on_delete=models.CASCADE)
+    questionnaire_participant = models.ForeignKey(
+        Questionnaire_Participants, on_delete=models.CASCADE)
     started_by = models.ForeignKey(Users, on_delete=models.CASCADE, default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "Started_Questionnaire"
 
 
+class Questionnaire_Data (models.Model):
+    questionnaire = models.ForeignKey(Questionnaire, on_delete=models.CASCADE)
+    ccc_number = models.CharField(max_length=15, null=True)
+    mfl_code = models.PositiveIntegerField()
+    has_completed_survey = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "Questionnaire_data"
+
 class Response (models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True)
     open_text = models.CharField(max_length=150, blank=True, null=True)
-    session = models.ForeignKey(Started_Questionnaire, on_delete=models.CASCADE, default=1)
+    session = models.ForeignKey(
+        Started_Questionnaire, on_delete=models.CASCADE, default=1)
     created_at = models.DateField(auto_now_add=True)
 
     class Meta:
@@ -89,8 +112,10 @@ class Patient_Consent(models.Model):
 
 
 class End_Questionnaire (models.Model):
-    session = models.OneToOneField(Started_Questionnaire, on_delete=models.CASCADE, default=1)
-    questionnaire = models.ForeignKey(Questionnaire, on_delete=models.CASCADE, default=1)
+    session = models.OneToOneField(
+        Started_Questionnaire, on_delete=models.CASCADE, default=1)
+    questionnaire = models.ForeignKey(
+        Questionnaire, on_delete=models.CASCADE, default=1)
 
     class Meta:
         db_table = "End_Questionnaire"
@@ -120,3 +145,44 @@ class Group_Questionnaire (models.Model):
 
     class Meta:
         db_table = "Group_Questionnaire"
+
+
+class ResponsesFlat(models.Model):
+    survey_id = models.CharField(max_length=100, primary_key=True)
+    submit_date = models.CharField(max_length=100, null=True)
+    partner_name = models.CharField(max_length=100, null=True)
+    county = models.CharField(max_length=100, null=True)
+    sub_county = models.CharField(max_length=100, null=True)
+    mfl_code = models.CharField(max_length=100, null=True)
+    facility_name = models.CharField(max_length=100, null=True)
+    ccc_no = models.CharField(max_length=100, null=True)
+    first_name = models.CharField(max_length=100, null=True)
+    middle_name = models.CharField(max_length=100, null=True)
+    last_name = models.CharField(max_length=100, null=True)
+    date_of_birth = models.CharField(max_length=100, null=True)
+    gender = models.CharField(max_length=100, null=True)
+    date_of_hiv_diagnosis = models.CharField(max_length=100, null=True)
+    ccc_enrolment_date = models.CharField(max_length=100, null=True)
+    art_start_date = models.CharField(max_length=100, null=True)
+    date_of_last_vl = models.CharField(max_length=100, null=True)
+    last_vl_result = models.CharField(max_length=100, null=True)
+    copies_per_ml = models.CharField(max_length=100, null=True)
+    number_of_visits = models.CharField(max_length=100, null=True)
+    visit_dates = models.CharField(max_length=100, null=True)
+    last_appointment_date = models.CharField(max_length=100, null=True)
+    current_regimen = models.CharField(max_length=100, null=True)
+    other_current_regimen = models.CharField(max_length=100, null=True)
+    non_verification_reason = models.CharField(max_length=100, null=True)
+    other_non_verification_reason = models.CharField(max_length=100, null=True)
+
+    class Meta:
+        managed = False
+        db_table = "vw_questionnaire_responses_flat_table"
+        unique_together = ('survey_id', 'ccc_no', 'other_non_verification_reason',
+                           'date_of_last_vl', 'art_start_date', 'gender')
+
+
+class QuestionnaireDataForm(ModelForm):
+    class Meta:
+        model = Questionnaire_Data
+        fields = ["ccc_number", "mfl_code"]
